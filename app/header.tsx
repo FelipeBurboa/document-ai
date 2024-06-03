@@ -1,8 +1,6 @@
-"use client";
-import { Authenticated, Unauthenticated } from "convex/react";
 import Image from "next/image";
-import { SignInButton, UserButton } from "@clerk/nextjs";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { HeaderActions } from "./header-actions";
 export function Header() {
   return (
     <div className="bg-slate-900 py-4">
@@ -17,16 +15,9 @@ export function Header() {
           />
           Document AI
         </div>
-        <div>
-          <Unauthenticated>
-            <SignInButton />
-          </Unauthenticated>
-          <Authenticated>
-            <div className="flex gap-5">
-              <ModeToggle />
-              <UserButton />
-            </div>
-          </Authenticated>
+        <div className="flex gap-5 items-center">
+          <HeaderActions />
+          <ModeToggle />
         </div>
       </div>
     </div>
