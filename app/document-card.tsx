@@ -10,16 +10,25 @@ import {
 import { Doc } from "@/convex/_generated/dataModel";
 import { EyeIcon } from "lucide-react";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DocumentCard({ document }: { document: Doc<"documents"> }) {
   return (
-    <Card>
+    <Card key={document._id} className="flex flex-col justify-between">
       <CardHeader>
         <CardTitle>{document.title}</CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
       <CardContent>
-        <p>Card Content</p>
+        {document.description ? (
+          <p>{document.description}</p>
+        ) : (
+          new Array(4).fill(0).map((_, i) => (
+            <div className="p-2">
+              <Skeleton className="h-[25px] rounded-sm w-full" />
+            </div>
+          ))
+        )}
       </CardContent>
       <CardFooter>
         <Button asChild variant="secondary">
