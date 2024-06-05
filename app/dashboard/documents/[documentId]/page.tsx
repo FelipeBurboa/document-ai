@@ -20,7 +20,7 @@ export default function DocumentPage({
   });
 
   return (
-    <main className="p-24 space-y-8">
+    <main className="w-full space-y-8">
       {!document && (
         <div className="space-y-8">
           <Skeleton className="h-[40px] w-[200px] rounded-sm" />

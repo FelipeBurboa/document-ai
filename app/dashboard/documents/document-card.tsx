@@ -32,7 +32,7 @@ export function DocumentCard({ document }: { document: Doc<"documents"> }) {
       </CardContent>
       <CardFooter>
         <Button asChild variant="secondary">
-          <Link href={`/documents/${document._id}`}>
+          <Link href={`/dashboard/documents/${document._id}`}>
             <EyeIcon className="mr-2 h-4 w-4" />
             View
           </Link>
