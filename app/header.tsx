@@ -5,7 +5,7 @@ import Link from "next/link";
 import { OrganizationSwitcher } from "@clerk/nextjs";
 export function Header() {
   return (
-    <div className="bg-slate-500 py-4 dark:bg-slate-900">
+    <div className="z-10 relative bg-slate-50 py-4 dark:bg-slate-900 shadow">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex gap-12 items-center">
           <Link href="/" className="flex items-center gap-4 text-2xl">

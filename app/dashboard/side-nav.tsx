@@ -53,7 +53,7 @@ export default function SideNav() {
             Notes
           </Link>
         </li>
-        <li>
+        {/*   <li>
           <Link
             className={cn(
               "flex gap-1 items-center text-xl hover:text-cyan-600",
@@ -66,7 +66,7 @@ export default function SideNav() {
             <Settings className="w-6 h-6" />
             Settings
           </Link>
-        </li>
+        </li> */}
       </ul>
     </nav>
   );
