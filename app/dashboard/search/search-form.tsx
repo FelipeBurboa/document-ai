@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui/input";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Doc, Id } from "@/convex/_generated/dataModel";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LoadingButton } from "@/components/loading-button";
+import { useOrganization } from "@clerk/nextjs";
 
 const formSchema = z.object({
   search: z.string().min(2).max(250),
@@ -26,7 +26,7 @@ export function SearchForm({
   setResults: (notes: typeof api.search.searchAction._returnType) => void;
 }) {
   const askQuestion = useAction(api.search.searchAction);
-
+  const organization = useOrganization();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,7 +35,10 @@ export function SearchForm({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await askQuestion({ search: values.search }).then(setResults);
+    await askQuestion({
+      search: values.search,
+      orgId: organization.organization?.id,
+    }).then(setResults);
     form.reset();
   }
 

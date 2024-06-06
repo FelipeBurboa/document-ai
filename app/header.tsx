@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { HeaderActions } from "./header-actions";
 import Link from "next/link";
+import { OrganizationSwitcher } from "@clerk/nextjs";
 export function Header() {
   return (
     <div className="bg-slate-500 py-4 dark:bg-slate-900">
@@ -17,9 +18,10 @@ export function Header() {
             />
             Document AI
           </Link>
-          <nav>
+          <nav className="flex gap-5">
+            <OrganizationSwitcher />
             <Link href="/dashboard" className="hover:text-slate-300">
-              Documents{" "}
+              Dashboard
             </Link>
           </nav>
         </div>

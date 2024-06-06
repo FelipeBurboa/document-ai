@@ -35,8 +35,19 @@ export async function hasAccessToDocument(
 
   const document = await ctx.db.get(documentId);
 
-  if (document?.tokenIdentifier !== userId || !document) {
+  if (!document) {
     return null;
+  }
+
+  if (document.orgId) {
+    const hasAccess = await hasOrgAcess(ctx, document.orgId);
+    if (!hasAccess) {
+      return null;
+    }
+  } else {
+    if (document?.tokenIdentifier !== userId) {
+      return null;
+    }
   }
 
   return { document, userId };
@@ -51,17 +62,51 @@ export const hasAccessToDocumentQuery = internalQuery({
   },
 });
 
+export const hasOrgAcess = async (
+  ctx: MutationCtx | QueryCtx,
+  orgId: string
+) => {
+  const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+  if (!userId) {
+    return false;
+  }
+
+  const membership = await ctx.db
+    .query("memberships")
+    .withIndex("by_orgId_userId", (q) =>
+      q.eq("orgId", orgId).eq("userId", userId)
+    )
+    .first();
+
+  return !!membership;
+};
+
 export const getDocuments = query({
-  async handler(ctx) {
+  args: {
+    orgId: v.optional(v.string()),
+  },
+  async handler(ctx, args) {
     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
     if (!userId) {
       return undefined;
     }
 
-    return ctx.db
-      .query("documents")
-      .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", userId))
-      .collect();
+    if (args.orgId) {
+      const isMember = await hasOrgAcess(ctx, args.orgId);
+      if (!isMember) {
+        return undefined;
+      }
+      return ctx.db
+        .query("documents")
+        .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+        .collect();
+    } else {
+      return ctx.db
+        .query("documents")
+        .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", userId))
+        .collect();
+    }
   },
 });
 
@@ -92,6 +137,7 @@ export const createDocument = mutation({
   args: {
     title: v.string(),
     fileId: v.id("_storage"),
+    orgId: v.optional(v.string()),
   },
 
   async handler(ctx, args) {
@@ -99,12 +145,27 @@ export const createDocument = mutation({
     if (!userId) {
       throw new ConvexError("Unauthorized");
     }
-    const documentId = await ctx.db.insert("documents", {
-      title: args.title,
-      tokenIdentifier: userId,
-      fileId: args.fileId,
-      description: "",
-    });
+
+    let documentId: Id<"documents">;
+    if (args.orgId) {
+      const hasAccess = await hasOrgAcess(ctx, args.orgId);
+      if (!hasAccess) {
+        throw new ConvexError("Unauthorized");
+      }
+      documentId = await ctx.db.insert("documents", {
+        title: args.title,
+        fileId: args.fileId,
+        description: "",
+        orgId: args.orgId,
+      });
+    } else {
+      documentId = await ctx.db.insert("documents", {
+        title: args.title,
+        tokenIdentifier: userId,
+        fileId: args.fileId,
+        description: "",
+      });
+    }
 
     await ctx.scheduler.runAfter(
       0,

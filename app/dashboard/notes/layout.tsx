@@ -11,13 +11,17 @@ import { Id } from "@/convex/_generated/dataModel";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useOrganization } from "@clerk/nextjs";
 
 export default function NotesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const notes = useQuery(api.notes.getNotes);
+  const organization = useOrganization();
+  const notes = useQuery(api.notes.getNotes, {
+    orgId: organization.organization?.id,
+  });
   const { noteId } = useParams<{ noteId: Id<"notes"> }>();
 
   return (
