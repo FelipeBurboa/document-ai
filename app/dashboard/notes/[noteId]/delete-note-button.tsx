@@ -14,38 +14,36 @@ import {
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { btnIconStyles, btnStyles } from "@/styles/styles";
 import { useMutation } from "convex/react";
-import { TrashIcon } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function DeleteDocumentButton({
-  documentId,
-}: {
-  documentId: Id<"documents">;
-}) {
+export function DeleteNoteButton({ noteId }: { noteId: Id<"notes"> }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const deleteDocument = useMutation(api.documents.deleteDocument);
+  const deleteNote = useMutation(api.notes.deleteNote);
   const router = useRouter();
 
   return (
     <AlertDialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <AlertDialogTrigger>
-        <Button variant="destructive" className={btnStyles}>
-          <TrashIcon className={btnIconStyles} />
-          Delete
+        <Button
+          size="icon"
+          variant="destructive"
+          className="w-6 h-6 absolute -top-2 -right-2"
+        >
+          <Trash width={16} />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Are you sure you want to delete this document?
+            Are you sure you want to delete this note?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Your document will be deleted. This action cannot be undone and the
-            data will be lost.
+            Your note will be deleted. This action cannot be undone and the data
+            will be lost.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -53,9 +51,9 @@ export function DeleteDocumentButton({
           <LoadingButton
             onClick={() => {
               setIsLoading(true);
-              deleteDocument({ documentId })
+              deleteNote({ noteId })
                 .then(() => {
-                  router.push("/dashboard/documents");
+                  router.push("/dashboard/notes");
                 })
                 .finally(() => {
                   setIsLoading(false);
